@@ -9,7 +9,7 @@ Built with:
 - 📦 Qdrant as the vector store
 - 🧾 LangChain for chunking and semantic search
 - ⚙️ BullMQ for background PDF processing
-- 💬 Modern frontend using Catppuccin theme, Next.js, Clerk, ShadCN, Tailwind CSS, and Framer Motion
+- 💬 Modern frontend using Catppuccin theme, Next.js, ShadCN, Tailwind CSS, and Framer Motion
 
 ---
 
@@ -29,7 +29,6 @@ Built with:
 - Responsive modern chat UI with collapsible sidebar
 - Live PDF preview removed, files now open in new tab for simplicity
 - Modern UI with Catppuccin theme + responsive chat interface
-- Authentication using Clerk
 
 ---
 
@@ -37,7 +36,7 @@ Built with:
 
 | Layer        | Tools & Services                              |
 |--------------|-----------------------------------------------|
-| Frontend     | Next.js 15, React 19, Tailwind CSS 4, ShadCN UI, Clerk, Framer Motion, Catppuccin Theme |
+| Frontend     | Next.js 15, React 19, Tailwind CSS 4, ShadCN UI, Framer Motion, Catppuccin Theme |
 | Backend API  | Node.js, Express, Multer, BullMQ              |
 | AI / RAG     | LangChain, HuggingFace, OpenRouter, Qdrant    |
 | Worker       | BullMQ, LangChain, PDFLoader, Qdrant JS SDK   |
@@ -128,7 +127,6 @@ docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
 - `Next.js` with `Turbopack` for fast builds
 - `Tailwind CSS 4` and `ShadCN UI` for styling and components
 - `Framer Motion` for animations (line-by-line AI messages, loading states)
-- `Clerk` for authentication and user session handling
 - `Catppuccin` theme support with `next-themes`
 - `Lucide-react` icons, `react-markdown` for chat formatting
 
