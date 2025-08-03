@@ -31,10 +31,8 @@ services:
           type: redis
           name: valkey
           property: connectionString
-    # Secrets are now defined in an 'envVarGroup'
     envVarGroups:
       - name: api-keys
-        sync: true
 
   # 4. Background Worker Service
   - type: worker
@@ -50,10 +48,8 @@ services:
           type: redis
           name: valkey
           property: connectionString
-    # The worker will use the same secret group as the backend
     envVarGroups:
       - name: api-keys
-        sync: true
 
   # 5. Frontend Web Service
   - type: web
@@ -62,11 +58,11 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     plan: free
 
-# Define the secret group that the backend and worker will share
+# This is the SHARED group for secrets
 envVarGroups:
   - name: api-keys
     envVars:
       - key: OPENROUTER_API_KEY
-        sync: false # Set this in the Render dashboard
+        sync: false
       - key: HF_API_KEY
-        sync: false # Set this in the Render dashboard
+        sync: false
