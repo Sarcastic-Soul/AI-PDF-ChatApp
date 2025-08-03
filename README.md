@@ -52,16 +52,24 @@ git clone https://github.com/your-username/pdf-rag-chat-app.git
 cd pdf-rag-chat-app
 ```
 
-### 2. Install Backend Dependencies
+### 2. Install Dependencies
+
+Install dependencies for both frontend and backend:
 
 ```bash
-cd server
-npm install
+# Install frontend dependencies
+cd frontend
+pnpm install
+
+# Install backend dependencies
+cd ../backend
+pnpm install
 ```
 
-### 3. Setup `.env`
+### 3. Setup Environment Variables
 
-Create a `.env` file in the root of `server/`:
+#### Backend `.env`
+Create a `.env` file in the root of `backend/`:
 
 ```env
 OPENROUTER_API_KEY=your-openrouter-key
@@ -69,36 +77,48 @@ HF_API_KEY=your-huggingface-key
 QDRANT_URL=http://localhost:6333
 ```
 
-> Make sure Qdrant is running (via Docker or cloud URL)
+#### Frontend `.env.local`
+Create a `.env.local` file in the root of `frontend/`:
 
-### 4. Start Backend Server
-
-```bash
-npm run dev
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
+CLERK_SECRET_KEY=your-clerk-secret-key
 ```
 
+> Get your Clerk keys from [https://clerk.dev](https://clerk.dev) for authentication integration
+
+### 4. Start Services
+
+Start all services in the following order:
+
+#### Start Docker Services (Redis & Qdrant)
+```bash
+# From the root directory
+docker-compose up -d
+```
+
+#### Start Backend Server
+```bash
+# From the backend directory
+cd backend
+pnpm dev
+```
 Runs backend on [http://localhost:8000](http://localhost:8000)
 
----
-
-### 5. Start Worker (in separate terminal)
-
+#### Start Worker (in separate terminal)
 ```bash
-npm run dev:worker
+# From the backend directory
+cd backend
+pnpm dev:worker
 ```
-
 Processes uploaded PDFs in background and indexes content.
 
----
-
-### 6. Start Frontend
-
+#### Start Frontend (in separate terminal)
 ```bash
-cd client
-npm install
-npm run dev
+# From the frontend directory
+cd frontend
+pnpm dev
 ```
-
 Frontend runs on [http://localhost:3000](http://localhost:3000)
 
 ---
@@ -114,10 +134,16 @@ Frontend runs on [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 📦 Qdrant Setup (via Docker)
+## 📦 Docker Services
+
+The project uses Docker Compose to run Redis (for BullMQ) and Qdrant (vector database):
 
 ```bash
-docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
+# Start services
+docker-compose up -d
+
+# Stop services
+docker-compose down
 ```
 
 ---
