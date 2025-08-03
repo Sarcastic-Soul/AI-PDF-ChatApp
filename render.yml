@@ -1,0 +1,61 @@
+services:
+  # Valkey (Redis) service for BullMQ
+  - type: redis
+    name: valkey
+    ipAllowList: [] # Allow all
+    plan: free
+
+  # Qdrant vector store
+  - type: web
+    name: qdrant
+    env: docker
+    dockerfilePath: ./qdrant/Dockerfile # You'll need to create this Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: QDRANT__SERVICE__GRPC_PORT
+        value: 6334
+
+  # Backend API
+  - type: web
+    name: backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: OPENROUTER_API_KEY
+        fromSecret: true
+      - key: HF_API_KEY
+        fromSecret: true
+      - key: QDRANT_URL
+        value: http://qdrant:6333
+      - fromService:
+          type: redis
+          name: valkey
+          property: connectionString
+
+  # Background Worker
+  - type: worker
+    name: worker
+    env: docker
+    dockerfilePath: ./backend/worker.Dockerfile
+    plan: free
+    envVars:
+      - key: OPENROUTER_API_KEY
+        fromSecret: true
+      - key: HF_API_KEY
+        fromSecret: true
+      - key: QDRANT_URL
+        value: http://qdrant:6333
+      - fromService:
+          type: redis
+          name: valkey
+          property: connectionString
+
+  # Frontend Application
+  - type: web
+    name: frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    plan: free
