@@ -1,19 +1,16 @@
 services:
   # 1. Valkey (Redis) service for our BullMQ queue
-  # This is a managed database provided by Render.
   - type: redis
     name: valkey
     ipAllowList: [] # Allows other Render services to connect
     plan: free
 
   # 2. Qdrant vector store service
-  # This runs the official Qdrant image in a Docker container.
   - type: web
     name: qdrant
     env: docker
     dockerfilePath: ./qdrant/Dockerfile
-    plan: free # Note: The free plan may have limitations.
-    # Disks are needed to persist vector data across deploys
+    plan: free
     disks:
       - name: qdrant-data
         mountPath: /qdrant/storage
@@ -27,42 +24,36 @@ services:
     plan: free
     healthCheckPath: /
     envVars:
-      # These are secrets you will add in the Render dashboard
-      - key: OPENROUTER_API_KEY
-        fromSecret: true
-      - key: HF_API_KEY
-        fromSecret: true
-      # This tells the backend how to find the Qdrant service
       - key: QDRANT_URL
         value: http://qdrant:6333
-      # This automatically gets the connection URL from our Valkey service
       - key: REDIS_URL
         fromService:
           type: redis
           name: valkey
           property: connectionString
+    # Secrets are now defined in an 'envVarGroup'
+    envVarGroups:
+      - name: api-keys
+        sync: true
 
   # 4. Background Worker Service
   - type: worker
     name: worker
     env: docker
-    dockerfilePath: ./backend/worker.Dockerfile # Using the dedicated worker Dockerfile
+    dockerfilePath: ./backend/worker.Dockerfile
     plan: free
     envVars:
-      # Secrets are shared with the backend
-      - key: OPENROUTER_API_KEY
-        fromSecret: true
-      - key: HF_API_KEY
-        fromSecret: true
-      # Worker also needs to connect to Qdrant
       - key: QDRANT_URL
         value: http://qdrant:6333
-      # Worker also needs to connect to Valkey/Redis
       - key: REDIS_URL
         fromService:
           type: redis
           name: valkey
           property: connectionString
+    # The worker will use the same secret group as the backend
+    envVarGroups:
+      - name: api-keys
+        sync: true
 
   # 5. Frontend Web Service
   - type: web
@@ -70,3 +61,12 @@ services:
     env: docker
     dockerfilePath: ./frontend/Dockerfile
     plan: free
+
+# Define the secret group that the backend and worker will share
+envVarGroups:
+  - name: api-keys
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false # Set this in the Render dashboard
+      - key: HF_API_KEY
+        sync: false # Set this in the Render dashboard
