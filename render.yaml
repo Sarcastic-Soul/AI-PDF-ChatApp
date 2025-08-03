@@ -1,38 +1,38 @@
-# Environment variable group for shared secrets
+# 1. Define the shared environment variable group for secrets first.
 envVarGroups:
   - name: api-keys
     envVars:
       - key: OPENROUTER_API_KEY
-        sync: false # This means you will set the value in the Render dashboard
+        sync: false # Set the value in the Render dashboard
       - key: HF_API_KEY
-        sync: false # This means you will set the value in the Render dashboard
+        sync: false # Set the value in the Render dashboard
 
+# 2. Define all the services your application needs.
 services:
-  # 1. Valkey (Redis) service for our BullMQ queue
+  # Valkey (Redis) service
   - type: redis
     name: valkey
     ipAllowList: [] # Allows other Render services to connect
     plan: free
 
-  # 2. Qdrant vector store service
+  # Qdrant vector store service
   - type: web
     name: qdrant
     env: docker
     dockerfilePath: ./qdrant/Dockerfile
     plan: free
-    disks:
-      - name: qdrant-data
-        mountPath: /qdrant/storage
-        sizeGB: 1
+    # Attach the persistent disk defined below
+    disk:
+      name: qdrant-data
+      mountPath: /qdrant/storage
 
-  # 3. Backend API Service
+  # Backend API Service
   - type: web
     name: backend
     env: docker
     dockerfilePath: ./backend/Dockerfile
     plan: free
-    envVarGroups:
-      - api-keys # Apply the shared secret group
+    healthCheckPath: /
     envVars:
       - key: QDRANT_URL
         value: http://qdrant:6333
@@ -41,8 +41,11 @@ services:
           type: redis
           name: valkey
           property: connectionString
+    # Apply the shared secret group
+    envVarGroups:
+      - api-keys
 
-  # 4. Background Worker Service
+  # Background Worker Service
   - type: worker
     name: worker
     env: docker
@@ -59,9 +62,15 @@ services:
           name: valkey
           property: connectionString
 
-  # 5. Frontend Web Service
+  # Frontend Web Service
   - type: web
     name: frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile
     plan: free
+
+# 3. Define the persistent disk for the Qdrant service.
+databases:
+  - name: qdrant-data
+    disk:
+      sizeGB: 1
