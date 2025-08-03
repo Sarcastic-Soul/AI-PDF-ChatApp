@@ -48,8 +48,8 @@ Built with:
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/your-username/pdf-rag-chat-app.git
-cd pdf-rag-chat-app
+git clone https://github.com/Sarcastic-Soul/AI-PDF-ChatApp.git
+cd AI-PDF-ChatApp
 ```
 
 ### 2. Install Dependencies
