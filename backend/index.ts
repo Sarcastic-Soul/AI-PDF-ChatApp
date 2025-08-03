@@ -5,7 +5,6 @@ import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Queue } from "bullmq";
-import { OpenAIEmbeddings } from "@langchain/openai";
 import { QdrantVectorStore } from "@langchain/qdrant";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 import { OpenAI } from "openai";
@@ -42,11 +41,13 @@ const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
 });
 
 // ---- BullMQ (Optional) ----
+const connectionOptions = process.env.REDIS_URL || {
+    host: "localhost",
+    port: 6379,
+};
+
 const queue = new Queue("pdf-queue", {
-    connection: {
-        host: "localhost",
-        port: 6379,
-    },
+    connection: connectionOptions,
 });
 
 // ---- File Upload Setup ----

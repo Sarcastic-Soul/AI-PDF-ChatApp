@@ -8,6 +8,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const connectionOptions = process.env.REDIS_URL || {
+    host: "localhost",
+    port: 6379,
+};
+
 const worker = new Worker(
     "pdf-queue",
     async (job) => {
@@ -51,9 +56,6 @@ const worker = new Worker(
         }
     },
     {
-        connection: {
-            host: "localhost",
-            port: 6379,
-        },
+        connection: connectionOptions,
     }
 );
