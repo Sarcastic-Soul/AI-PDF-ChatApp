@@ -9,7 +9,7 @@ services:
   - type: web
     name: qdrant
     env: docker
-    dockerfilePath: ./qdrant/Dockerfile # You'll need to create this Dockerfile
+    dockerfilePath: ./qdrant/Dockerfile
     plan: free
     healthCheckPath: /
     envVars:
